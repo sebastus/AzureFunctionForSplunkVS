@@ -18,7 +18,7 @@ namespace AzureFunctionForSplunk
     {
         [FunctionName("EhDiagnosticLogs")]
         public static async Task Run(
-            [EventHubTrigger("insights-logs-diagnostics", Connection = "goliveHubConnection")]string[] messages,
+            [EventHubTrigger("%input-hub-name-diagnostics-logs%", Connection = "hubConnection")]string[] messages,
             TraceWriter log)
         {
             List<string> splunkEventMessages = MakeSplunkEventMessages(messages, log);
