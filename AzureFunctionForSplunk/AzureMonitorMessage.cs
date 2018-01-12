@@ -10,7 +10,7 @@ namespace AzureFunctionForSplunk
         public string ResourceType { get; set; }
         public string ResourceName { get; set; }
         public string ResourceGroup { get; set; }
-        protected string SplunkSourceType { get; set; }
+        public string SplunkSourceType { get; set; }
 
         public AzureMonitorMessage()
         {
@@ -18,6 +18,7 @@ namespace AzureFunctionForSplunk
             ResourceGroup = "";
             ResourceName = "";
             ResourceType = "";
+            SplunkSourceType = "";
         }
 
         public string GetSplunkEventFromMessage()
@@ -52,6 +53,40 @@ namespace AzureFunctionForSplunk
             m = Regex.Match(ResourceId, patternResourceName);
             ResourceName = m.Groups[1].Value;
 
+        }
+    }
+
+    public class MetricMessage : AzureMonitorMessage
+    {
+        public MetricMessage(string resourceId, dynamic message)
+        {
+            ResourceId = resourceId;
+            Message = message;
+
+            GetStandardProperties();
+
+            AddStandardProperties();
+
+        }
+
+        private void AddStandardProperties()
+        {
+            if (SubscriptionId != "")
+            {
+                Message.amm_SubscriptionId = SubscriptionId;
+            }
+            if (ResourceGroup != "")
+            {
+                Message.amm_ResourceGroup = ResourceGroup;
+            }
+            if (ResourceType != "")
+            {
+                Message.amm_ResourceType = ResourceType;
+            }
+            if (ResourceName != "")
+            {
+                Message.amm_ResourceName = ResourceName;
+            }
         }
     }
 
