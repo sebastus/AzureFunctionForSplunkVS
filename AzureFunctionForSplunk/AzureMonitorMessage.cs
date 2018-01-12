@@ -40,6 +40,7 @@ namespace AzureFunctionForSplunk
             var patternResourceGroup = "SUBSCRIPTIONS\\/(?:.*?)\\/RESOURCEGROUPS\\/(.*?)\\/";
             var patternResourceType = "PROVIDERS\\/(.*?\\/.*?)(?:\\/)";
             var patternResourceName = "PROVIDERS\\/(?:.*?\\/.*?\\/)(.*?)(?:\\/|$)";
+            var patternDatabase = "PROVIDERS\\/(.*?\\/.*?)(?:\\/)(?:.*\\/)(.*DATABASES)";
 
             Match m = Regex.Match(ResourceId, patternSubscriptionId);
             SubscriptionId = m.Groups[1].Value;
@@ -47,12 +48,20 @@ namespace AzureFunctionForSplunk
             m = Regex.Match(ResourceId, patternResourceGroup);
             ResourceGroup = m.Groups[1].Value;
 
-            m = Regex.Match(ResourceId, patternResourceType);
-            ResourceType = m.Groups[1].Value;
-
             m = Regex.Match(ResourceId, patternResourceName);
             ResourceName = m.Groups[1].Value;
 
+            m = Regex.Match(ResourceId, patternDatabase);
+            var group1 = m.Groups[1].Value;
+            var group2 = m.Groups[2].Value;
+            if (group2 == "DATABASES")
+            {
+                ResourceType = group1 + "/" + group2;
+            } else
+            {
+                m = Regex.Match(ResourceId, patternResourceType);
+                ResourceType = m.Groups[1].Value;
+            }
         }
     }
 
