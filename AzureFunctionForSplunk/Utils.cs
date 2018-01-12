@@ -34,6 +34,7 @@ namespace AzureFunctionForSplunk
             catch (Exception ex)
             {
                 dictionary = new Dictionary<string, string>();
+                throw;
             }
 
             return dictionary;

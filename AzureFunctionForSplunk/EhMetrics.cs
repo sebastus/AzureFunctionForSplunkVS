@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.ServiceBus;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
@@ -31,7 +32,15 @@ namespace AzureFunctionForSplunk
 
         private static List<string> MakeSplunkEventMessages(string[] messages, TraceWriter log)
         {
-            Dictionary<string, string> MetricsCategories = Utils.GetDictionary("../../../MetricsCategories.json");
+            Dictionary<string, string> MetricsCategories = new Dictionary<string, string>();
+            try
+            {
+                MetricsCategories = Utils.GetDictionary("../../../MetricsCategories.json");
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Error getting categories json file. {ex.Message}");
+            }
 
             List<string> splunkEventMessages = new List<string>();
 
