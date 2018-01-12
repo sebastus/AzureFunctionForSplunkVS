@@ -22,6 +22,22 @@ namespace AzureFunctionForSplunk
             return result;
         }
 
+        public static string getFilename(string basename)
+        {
+
+            var filename = "";
+            var home = getEnvironmentVariable("HOME");
+            if (home.Length == 0)
+            {
+                filename = "../../../" + basename;
+            }
+            else
+            {
+                filename = home + "\\site\\wwwroot\\" + basename;
+            }
+            return filename;
+        }
+
         public static Dictionary<string, string> GetDictionary(string filename)
         {
             Dictionary<string, string> dictionary;

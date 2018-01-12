@@ -38,9 +38,14 @@ namespace AzureFunctionForSplunk
         private static List<string> MakeSplunkEventMessages(string[] messages, TraceWriter log)
         {
             Dictionary<string, string> DiagnosticLogCategories = new Dictionary<string, string>();
+
+            var filename = Utils.getFilename("DiagnosticLogCategories.json");
+
+            // log.Info($"File name of categories dictionary is: {filename}");
+
             try
             {
-                DiagnosticLogCategories = Utils.GetDictionary("../../../DiagnosticLogCategories.json");
+                DiagnosticLogCategories = Utils.GetDictionary(filename);
             }
             catch (Exception ex)
             {
