@@ -2,10 +2,12 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +15,13 @@ namespace AzureFunctionForSplunk
 {
     public class Utils
     {
+        static string splunkCertThumbprint { get; set; }
+
+        public Utils()
+        {
+            splunkCertThumbprint = getEnvironmentVariable("splunkCertThumbprint");
+        }
+
         public static string getEnvironmentVariable(string name)
         {
             var result = System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
@@ -84,6 +93,20 @@ namespace AzureFunctionForSplunk
             }
         }
 
+        public static bool ValidateMyCert(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors sslErr)
+        {
+            // if user has not configured a cert, anything goes
+            if (splunkCertThumbprint == "")
+                return true;
+
+            // if user has configured a cert, must match
+            var thumbprint = cert.GetCertHashString();
+            if (thumbprint == splunkCertThumbprint)
+                return true;
+
+            return false;
+        }
+
         public static async Task obHEC(List<string> standardizedEvents, TraceWriter log)
         {
             string splunkAddress = Utils.getEnvironmentVariable("splunkAddress");
@@ -96,9 +119,7 @@ namespace AzureFunctionForSplunk
 
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            ServicePointManager.ServerCertificateValidationCallback =
-            new System.Net.Security.RemoteCertificateValidationCallback(
-                delegate { return true; });
+            ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(ValidateMyCert);
 
             var newClientContent = new StringBuilder();
             foreach (string item in standardizedEvents)
