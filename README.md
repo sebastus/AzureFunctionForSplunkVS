@@ -88,16 +88,20 @@ Note that the actual settings are not in the code. These are provided by you in 
 
 If you want to automate the creation of your Azure Function (recommended), there is a solution template that accomplishes this located here:
 
-[Azure Function Deployment](https://github.com/sebastus/AzureFunctionDeployment)
+[Azure Function Deployment ARM template.](https://github.com/sebastus/AzureFunctionDeployment/tree/SplunkVS)
 
-Use the SplunkVS branch. It's configured specifically for this function.  
+Use the SplunkVS branch in the link. It's configured specifically for this function.  
 
-Once the Function App exists, add the appropriate values into settings:
+Once the Function App exists, add the appropriate values into settings. The settings are created automatically if you use the ARM template (the 'Deploy to Azure' button.)
 
 #### Using HEC output binding
 
+* hubConnection - connection string for the hub namespace
+* input-hub-name-activity-logs - should be set to 'insights-operational-logs'
+* input-hub-name-diagnostics-logs - set to name of hub for diagnostic logs, e.g. insights-diagnostic-logs (or your other custom choice)
+* input-hub-name-metrics - 'insights-metrics-pt1m'
 * outputBinding - HEC
 * splunkAddress - e.g. https://YOURVM.SOMEREGION.cloudapp.azure.com:8088/services/collector/event
 * splunkToken - e.g. 5F1B2C8F-YOUR-GUID-HERE-CE29A659E7D1
-
+* splunkCertThumbprint - leave blank to ignore cert validity. This is a good choice if you haven't yet installed your own cert on Splunk Enterprise. Set it to the thumbprint of your cert once it's installed in Splunk Enterprise.
 
