@@ -63,13 +63,20 @@ namespace AzureFunctionForSplunk
 
                 foreach (var record in records)
                 {
-                    var category = record.category;
                     var resourceId = record.resourceId;
 
                     var splunkEventMessage = new DiagnosticLogMessage(resourceId, record);
 
                     var resourceType = splunkEventMessage.ResourceType;
 
+                    string category;
+                    try
+                    {
+                        category = record.category;
+                    } catch
+                    {
+                        category = "none";
+                    }
                     var sourceType = Utils.GetDictionaryValue(resourceType.ToUpper() + "/" + category.ToUpper(), DiagnosticLogCategories) ?? "amdl:diagnostic";
 
                     splunkEventMessage.SetSourceType(sourceType);
